@@ -19,3 +19,48 @@ var s2: String? = null // null이 될 수 있음
 var s2: String = "" // null이 될 수 없음
 ```
 이러한 코드를 통해 ?가 없이 변수를 선언한다면 null이 될수 없도록 설정해 놓고 ?을 통해 null을 허용하는지 안하는지 확인이 가능하다.
+
+
+# 02 코틀린 함수
+
+## 함수 정의
+
+```kotlin function
+fun 함수 이름([변수 이름: 자료형, 변수 이름: 자료형..]  ): [반환값의 자료형] { 
+    표현식...
+    [return 반환값] 
+}
+```
+코틀린에서 모든 함수는 fun 이라는 키워드로 시작 한다 . 매개변수는 콤마(,)와 함께 여러 개를 지정할 수 있고 반드시 콜론(:)과 함께 자료형을 명시해 주어야 합니다. 함수가 반환하는 값이 있다면 반환값의 자료형도 반드시 명시해야 한다.
+
+## 함수 정의의 예
+
+```kotlin function ex
+fun sum(a: Int, b: Int): Int {
+    return a + b
+}
+```
+함수의 반환값을 생략될 수 있으며, 이는 return 문을 생략할 수 있다. 대신 반환값의 자료형을 Unit으로 지정하거나 생략한다.(java void 함수랑 비슷함) 
+
+## 가변인자를 가진함수
+
+
+함수 인자로 정해진 크기의 인자를 전달하는것이 아니라 매번 다른 크기의 인자를 전달한다면 가변 인자(variable arguments)를 사용하면 된다.
+
+```kotlin variable arguments ex
+fun main(args: Array<String>) {
+
+    normalVarargs(1, 2, 3, 4) // 4개의 인자 구성
+    normalVarargs(4, 5, 6)    // 3개의 인자 구성
+}
+
+fun normalVarargs(vararg counts: Int) {
+    for (num in counts) {
+        println("$num")
+    }
+    print("\n")
+}
+```
+
+
+
