@@ -149,3 +149,22 @@ when (x) {
 }
 ```
 
+## 흐름의 중단과 반환
+
+
+인라인으로 선언되지 않은 람다식 함수에서 return을 사용할 때는 그냥 사용할 수 없다. return @lavel과 같이 라벨 표기와 함께 사용해야 한다
+``` kotlin
+fun inlineLambda(a: Int, b: Int, out: (Int, Int) -> Unit) { // inline이 제거됨
+    out(a, b)
+}
+
+fun retFunc() {
+    println("start of retFunc")
+    inlineLambda(13, 3) lit@{ a, b ->  // ① 람다식 블록의 시작 부분에 라벨을 지정함
+        val result = a + b
+        if(result > 10) return@lit // ② 라벨을 사용한 블록의 끝부분으로 반환
+        println("result: $result")
+    } // ③ 이 부분으로 빠져나간다
+    println("end of retFunc") //  ④ 이 부분이 실행됨 
+}
+
