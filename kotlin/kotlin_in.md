@@ -167,4 +167,27 @@ fun retFunc() {
     } // ③ 이 부분으로 빠져나간다
     println("end of retFunc") //  ④ 이 부분이 실행됨 
 }
+```
+
+# 04 코틀린의 표준함수 활용
+
+## 고차함수
+
+고차함수는 함수의 매개변수로 함수를 받거나 함수 자체를 반환할 수 있는 함수이다.
+
+```kotlien
+fun inc(x: Int): Int {
+    return x + 1
+}
+
+fun high(name: String, body: (Int)->Int): Int {
+    println("name: $name")
+    val x = 0
+    return body(x)
+}
+```
+
+## 클로저
+
+람다식 함수를 이용하다 보면 내부 함수에서 외부 변수를 사용 할때가 있다. 클로저란 람다식으로 표현된 내부 함수에서 외부 범우에 선언된 변수에 접근할 수 있는 개념이다
 
