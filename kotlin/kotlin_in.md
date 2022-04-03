@@ -209,7 +209,7 @@ class Calc {
 위코드와 같이 result는 람다식 내부에서 재할당 되어 사용되는데 이때 할당된 값은 유지되 출력문에서 사용 될수 있게 된다.
 
 예제
-```
+```kotilen
 // 길이가 일치하는 이름만 반환
 fun filteredNames(length: Int) {
     val names = arrayListOf("Kim", "Hong", "Go", "Hwang", "Jeon")
@@ -221,7 +221,195 @@ fun filteredNames(length: Int) {
 ...
 filteredNames(4)
 ```
-이렇게 클로저 사용시 내부의 람다식 함수에서 외부 함수의 변수에 접근해 처리 효율성 상승 오나전히 다른 함수에서 변수의 접근을 제한할 수 있다. 
+이렇게 클로저 사용시 내부의 람다식 함수에서 외부 함수의 변수에 접근해 처리 효율성 상승 완전히 다른 함수에서 변수의 접근을 제한할 수 있다. 
+
+
+## 코틀린의 표준 라이브러리
+
+람다식을 사용하는 코틀린의 표준 라이브러리에서 let,apply,with,also,run 등 여러 가지 표준 함수를 활용해 코드의 효율을 높인다. 이러한 함수를 통해 기존의 복잡한 코드를 단순화 효율적으로 만든다.
+
+### let()활용하기
+let함수는 함수를 호출하는 객체 T를 이어지는 block의 인자로 넘기고 block의 결과값 R을 반환
+
+```kotilen
+// 표준 함수의 정의
+public inline fun <T, R> T.let(block: (T) -> R): R { ... return block(this) }
+```
+
+T나 R은 let() 확장 함수를 사용하기 위해 어떤 자료형이더라도 사용할수 있도록 일반화한 문자, 형식 매개변수라고 한다. 예를 들어 정수형, 문자열, 특정 클래스의 객체등에 let()함수를 확장함수로 사용할수 있게 된다. 
+
+```kotilen
+    val score: Int? = 32
+...
+    // let을 사용해 null 검사를 제거
+    fun checkScoreLet() {
+        score?.let { println("Score: $it") } // ①
+        val str = score.let { it.toString() } // ②
+        println(str)
+    }
+```
+ 이 코드와 같이 let은 특정 선언 변수를 T요소로 받아 결정되는데 여기서 널 가능한 정수형 변수이다. 이변수는 Int의 객체라고 말할 수 있다. 
+
+### null 가능성 있는 객체에서 let() 활용하기
+let을 세이프 콜(?.)과 함께 사용하면 if(null!=obj)와 같은 null 검사 부분을 대체 할 수 있다.
+
+```kotlin
+obj?.let { // obj가 null이 아닐 경우 작업 수행 (Safe calls + let 사용)
+    Toast.makeText(applicationContext, it, Toast.LENGTH_LONG).show()
+}
+```
+따라서 이 코드는 obj가 널이 아닌 경우에만 let 블록 구문을 수행, 널이면 아무런 일도 하지 않게 된기에 NPE를 방지할 수 있다.
+
+### 체이닝을 사용할 때 let() 활용하기
+체이닝이란 여러 메서드 혹은 함수를 연속적으로 호출하는 기법 으로 let()함수를 체이닝 형태로 사용할 수 있다.
+```kotlin
+var a = 1
+var b = 2
+
+a = a.let { it + 2 }.let {
+    val i = it + b
+    i  // 마지막 식 반환
+}
+println(a) //5
+```
+코드에서처럼 첫 번쨰 a.let{...} 블록의 처리 결과를 다시한번 let{...}블록으로 넘겨서 처리할 수 있다.
+코드의 가독성을 고려한다면 너무 많은 let을 사용하는 것은 권장되지 않는다.
+
+
+## also()
+
+also()는 함수를 호출하는 객체 T를 이어지는 block에 전달하고 객체 T 자체를 반환
+
+```kotlin
+// 표준 함수의 정의
+public inline fun <T> T.also(block: (T) -> Unit): T { block(this); return this }
+```
+also는 let과 역할이 동일해 보이나, also는 블록 안의 코드 수행 결과와 상관없이 T인 객체 this를 반환
+하게된다.
+
+```kotlin
+var m = 1
+m = m.also { it + 3 }
+println(m) // 원본 값 1
+```
+위 코드처럼 연산 결과인 4가 할당이 아니라 it의 값인 m의 본래값  1이 할당된다.
+
+## apply()
+
+apply()함수는 also()함수와 마찬가지로  객체 T를 이어지는 block에 전달하고 객체 T 자체를 반환 한다.
+
+```kotlin
+public inline fun <T> T.apply(block: T.() -> Unit): T { block(); return this }
+```
+apply()함수는 특정 객체를 생성하면서 함께 호출해야 하는 초기화 코드가 있는 경우 사용할 수 있다.
+
+
+```kotlin
+fun main() {
+    data class Person(var name: String, var skills : String)
+    var person = Person("Kildong", "Kotlin")
+
+    // 여기서 this는 person 객체를 가리킴
+    person.apply { this.skills = "Swift" }
+    println(person)
+
+    val retrunObj = person.apply { 
+        name = "Sean" // ① this는 생략할 수 있음
+        skills = "Java" // this 없이 객체의 멤버에 여러 번 접근
+    }
+    println(person)
+    println(retrunObj)
+}
+```
+apply는 확장 함수로서 person을 this로 받아온다 사실 클로저를 사용하는 방식과 같다. 따라서 객체의 프로퍼티를 변경하면 원본 객체에 반영되고 또한 이 객체는 this로 반환된다.
+
+## run()
+
+run()함수는 인자가 없는 익명 함수처럼 동작하는 형태로 단독 사용하거나 확장 함수 형태로 호출하는 형태
+두 가지로 사용할 수 있다.
+
+```kotlin
+public inline fun <R> run(block: () -> R): R  = return block()
+public inline fun <T, R> T.run(block: T.() -> R): R = return block()
+```
+독립적으로 사용할 때는 block에 처리할 내용을 넣어주며 마지막 식이 반환된다.
+
+```kotlin
+val a = 10
+skills = run {
+    val level = "Kotlin Level:" + a
+    level // 마지막 표현식이 반환됨
+}
+```
+할당 없이 사용할 때는 체이닝을 사용해 특정 결과에 대한 메서드 실행 할 수 있다.
+
+```kotlin
+  run {
+        if (firstTimeView) introView else normalView
+    }.show()
+```
+
+## with()
+with() 함수는 인자로 받는 개체를 이어지는 block의 receiver로 전달하며 결과값을 반환, run()함수와 기능 거의 동일하며, run의 경우 receiver가 없지만 with에서는 receiver로 전달할 객체를 처리한다.
+
+```kotlin
+// 표준 함수의 정의
+public inline fun <T, R> with(receiver: T, block: T.() -> R): R  = receiver.block()
+```
+with는 확장 함수 형태가 아니고 단독으로 사용되는 함수이다. with은 세이프 콜(?.)은 지원하지 않기에 let과 같이 사용기도 한다.
+
+```kotlin
+supportActionBar?.let {
+    with(it) {
+        setDisplayHomeAsUpEnabled(true)
+        setHomeAsUpIndicator(R.drawable.ic_clear_white)    
+    }
+}
+```
+따라서 null의 경우를 조사하려면 run을 확장함수 형태로 사용하는 것이 좋다.
+
+```kotlin
+supportActionBar?.run {
+    setDisplayHomeAsUpEnabled(true)
+    setHomeAsUpIndicator(R.drawable.ic_clear_white)
+}
+```
+
+## use()
+
+보통 특정 객체가 사용된 후 닫아야 하는경우( ex) 파일받고 닫기)가 생기는데 use()를 사용하면 객체사용후 close()등을 자동적으로 호출해 닫아 줄 수 있다.
+
+```kotlin
+// 표준 함수의 정의
+public inline fun <T : Closeable?, R> T.use(block: (T) -> R): R 
+```
+먼저 T의 제한된 자료형을 보면 Closeable?로 block은 닫힐 수 있는 객체를 지정해야 한다.
+
+``` kotlin
+fun main() {
+
+    PrintWriter(FileOutputStream("d:\\test\\output.txt")).use {
+        it.println("hello")
+    }
+}
+```
+
+PrintWirter은 파일을 열거나 새롭게 생성해 파일에 출력할 수 있다. 이때 use를 사용하는데 먼저 콘솔에 출력하듯 println을 통해 파일을 출력하고 이후 use는 열었던 파일을 닫아주는 작업을 내부에서 진행
+
+## takeIf() 와 takeUnless()
+
+takeIf()는 람다식이 true 이면 결과를 반환, takeUnIess()는 람다식이 false면 결과를 반환
+
+```kotlin
+// 표준 함수의 정의
+public inline fun <T> T.takeIf(predicate: (T) -> Boolean): T?
+  = if (predicate(this)) this else null
+```
+
+takeIf()함수의 정의에서 볼 수 있듯 predicate 는 T 객체를 매개변수로 받아오고, true이면 this 아니면 null을 반환 
+
+
+
 
 
 
