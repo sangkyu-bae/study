@@ -206,7 +206,22 @@ class Calc {
     }
 }
 ```
-위코드와 같이 result는 람다식 내부에서 재할당 되어 사용되는데 이때 할당된 값은 유지되 출력문에서 사용 될수 있게 됩니다.
+위코드와 같이 result는 람다식 내부에서 재할당 되어 사용되는데 이때 할당된 값은 유지되 출력문에서 사용 될수 있게 된다.
+
+예제
+```
+// 길이가 일치하는 이름만 반환
+fun filteredNames(length: Int) {
+    val names = arrayListOf("Kim", "Hong", "Go", "Hwang", "Jeon")
+    val filterResult = names.filter {
+        it.length == length // 바깥의 length에 접근 
+    }
+    println(filterResult)
+}
+...
+filteredNames(4)
+```
+이렇게 클로저 사용시 내부의 람다식 함수에서 외부 함수의 변수에 접근해 처리 효율성 상승 오나전히 다른 함수에서 변수의 접근을 제한할 수 있다. 
 
 
 
