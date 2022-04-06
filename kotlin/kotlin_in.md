@@ -445,7 +445,7 @@ abstract class Vehicle(val name: String, val color: String, val weight: Double) 
 
 인터페이스는 클르사가 아니며 따라서 상속이라는 형태로 하위 클래스에 프로퍼티와 메서드를 전달하지 않는다. 그렇기 때문에 하위 클래스 보다는 구현 클래스라고 한다. 이런 구현 클래스는 인터페이스가 제시한 메서드들을 구체적으로 구현 한다는 것에 있으며 인터페이스는 구현 클래스들과 강한 연관을 가지지 않는다.
 
-```kotiln
+```kotlin
 interface Pet {
     var category: String // abstract 키워드가 없어도 기본은 추상 프로퍼티
     fun feeding() // 마찬가지로 추상 메서드
@@ -456,6 +456,148 @@ interface Pet {
 ```
 
 인터페이스에서 추상 클래스와 다르게 abstarct을 붙여 주지 않아도 기본적으로 추상 프로퍼티와 추상 메서드가 지정, 메서드에 기본 구현부가 있으면 일반 메서드로 기본 구현을 가지게 된다.
+
+
+## 데이터 클래스
+
+보통 데이터 전달을 위한 객체를 DTO라고 부른다. DTO는 구현 로직을 가지고 있지 않고 순수한 데이터 객체를 표현 하기 때문에 게터/세터 메서드를 가진다. 자바에서는 모두 정의하려면 소스 코드가 길어지나 코틀린에서는 간단하게 표현할 수 있다.
+
+```kotlin
+data class Customer(var name: String, var email: String)
+```
+데이터 클래스는 생성자는 최소한 하나의 매개변수를 가지며, 주 생성자의 모든 매개변수는 val, var로 지정된 프로퍼티여야하고, 데이터 클래스는 abstarac, open, sealed, inner 키워드를 사용할 수 없다.
+
+
+## 중첩 클래스
+
+코틀린에서 중첩 클래스는 기본적으로 정적 클래스처럼 다뤄진다. 중첩 클래스는 객체 생성 없이 접근할 수 있다.
+
+```kotlin
+class Outer {
+    val ov = 5
+    class Nested {
+        val nv = 10
+        fun greeting() = "[Nested] Hello ! $nv" // 외부의 ov에는 접근 불가
+    }
+    fun outside() {
+        val msg = Nested().greeting() // 객체 생성 없이 중첩 클래스의 메서드 접근
+        println("[Outer]: $msg, ${Nested().nv}") // 중첩 클래스의 프로퍼티 접근
+    }
+}
+
+fun main() {
+    // static 처럼 Outer의 객체 생성 없이 Nested객체를 생성 사용할 수 있음
+    val output = Outer.Nested().greeting()
+    println(output)
+
+   // Outer.outside() // 에러! Outer 객체 생성 필요
+    val outer = Outer()
+    outer.outside()
+}
+```
+
+Outer.Nested().greeting()과 같은 방법으로 중첩 클래스의 메서드가 객체 생성 없이 호출될 수 있다.
+
+## 이너 클래스
+
+이너 클래스는 클래스 안에 이너 클래스를 정의할 수 있다. 이때 이너 클래스는 바깥 클래스의 멤버들에 접근할 수 있다.
+
+```kotlin
+class Smartphone(val model: String) {
+
+    private val cpu = "Exynos"
+
+    inner class ExternalStorage(val size: Int) {
+        fun getInfo() = "${model}: Installed on $cpu with ${size}Gb" // 바깥 클래스의 프로퍼티 접근
+    }
+}
+
+fun main() {
+    val mySdcard = Smartphone("S7").ExternalStorage(32)
+    println(mySdcard.getInfo())
+}
+```
+
+## 지역 클래스
+
+지역 클래스는 특정 메서드의 블록이나 init 블록과 같이 블록 범위에서만 유효한 클래스, 블록 범위를 벗어나면 더이상 사용되지 않는다.
+
+```kotlin
+..
+class Smartphone(val model: String) {
+
+    private val cpu = "Exynos"
+...
+    fun powerOn(): String {
+        class Led(val color: String) {  // 지역 클래스 선언
+            fun blink(): String = "Blinking $color on $model"  // 외부의 프로퍼티는 접근 가능
+        }
+        val powerStatus = Led("Red") // 여기에서 지역 클래스가 사용됨
+        return powerStatus.blink()
+    } // powerOn() 블록 끝
+}
+
+fun main() {
+...
+    val myphone = Smartphone("Note9")
+    myphone.ExternalStorage(128)
+    println(myphone.powerOn())
+}
+```
+
+## 익명 객체
+
+자바에서는 익명 이너 클래스라는 것을 제공해 일회성으로 객체를 생성해 사용한다. 코틀린에서는 이와 같은 기능을 object 키워드를 사용하여 익명 객체로 같은 기능을 수행, 자바와 다른 점은 익명 객체 기법이 다중의 인터페이스를 구현할 수 있다는점이다.
+
+```kotlin
+interface Switcher { // ① 인터페이스의 선언
+    fun on(): String
+}
+
+class Smartphone(val model: String) {
+...
+    fun powerOn(): String {
+        class Led(val color: String) {  
+            fun blink(): String = "Blinking $color on $model" 
+        }
+        val powerStatus = Led("Red")
+        val powerSwitch = object : Switcher {  // ② 익명 객체를 사용해 Switcher의 on()을 구현
+            override fun on(): String {
+                return powerStatus.blink()
+            }
+        } // 익명(object) 객체 블록의 끝
+        return powerSwitch.on() // 익명 객체의 메서드 사용
+    }
+}
+...
+```
+
+## 실드 클래스
+
+실드 클래스를 선언하려면 sealed 키워드를 class아 함께 사용한다. 실드 클래스는 그 자체로 추상 클래스와 같기 때문에 객체를 만들 수 없다. 또한 생성자도 기본적으로 private이고 private가 아닌 생서자는 허용되지 않는다. 실드 클래스는 같은 파일 안에서 상속이 가능하나 다른 파일에서는 상속이 불가능 하다. 블록 안에 선언되는 클래스는 상속이 필요한 경우 open 키워드로 선언될 수 있다.
+
+```kotlin
+sealed class Result {
+    open class Success(val message: String): Result()
+    class Error(val code: Int, val message: String): Result()
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
