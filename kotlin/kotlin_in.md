@@ -583,6 +583,44 @@ sealed class Result {
 }
 ```
 
+# 05 제네릭과 배열
+
+## 제네릭
+
+제네릭은 클래스 내부에서 사용할 자료형을 나중에 인스턴스로 생성할 때 확정한다. 제네릭이 나오게 된 배경은 자료형의 객체들을 다루는 메소드나 클래스에서 컴파일 시간에 자료형을 검사해 적당한 자료형을 선택할 수 있도록 하기 위해서 이다. 제네릭을 사용하면 객체의 자료형을 컴파일 시에 체크하기 때문에 객체 자료형의 안정성을 높이고 형 변환 번거로움이 줄어든다
+
+```kotlin
+
+class Box<T>(t: T) { // 제네릭을 사용해 형식 매개변수를 받아 name에 저장
+    var name = t
+}
+fun main() {
+    val box1: Box<Int> = Box<Int>(1)
+    val box2: Box<String> = Box<String>("Hello")
+
+    println(box1.name)
+    println(box2.name)
+}
+
+```
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
