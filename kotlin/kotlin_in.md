@@ -652,7 +652,92 @@ println("arr2: ${Arrays.toString(arr2)}")
 
 first()나 last()를 이용하여 첫 번쨰나 마지막 요소를 확인 
 
+
+# 07 컬렉션
+
+## 컬렉션의 종류
+
+코틀린의 커렉션은 자바 컬렉션의 구조를 확장 구현한 것으로 ,List, Set, Map 등이 있으며 자바와는 다르게 불변형 가변형으로 나누어 컬렉션을 다룬다. 가변형 컬렉션 타입은 객체의 데이터의 추가/변경이 가능 하며, 불변형은 한번 할당하면 읽기 전용으로 된다. 자바는 오로지 가변형 이기 때문에 자바와 상호작용하는 경우 주의해야 한다.
+
+## 리스트
+
+List는 순서에 따라 정렬된 요소를 가지는 컬렉션으로, 가장 많이 사용되는 컬렉션이다. 먼저 값을 변경할 수 없는 불변형 List를 만들기 위해 헬퍼 함수인 listOf()를 사용한다. 값을 변경할 수 있는 가변형을 표현하기 위해서는 mutableListOf()를 사용하며, 인자는 원하는 만큼 가변 인자를 가지도록 vararg로 선언할 수 있다.
+
+```kotlin
+fun main() {
+    // 불변형 List의 사용
+    var numbers: List<Int> = listOf(1, 2, 3, 4, 5)
+    var names: List<String> = listOf("one", "two", "three")
+
+    for (name in names) {
+        println(name)
+    }
+    for (num in numbers) print(num)  // 한 줄에서 처리하기
+    println() // 내용일 없을 때는 한 줄 내리는 개행
+}
+```
+
+## setOf()
+
+setOf()는 읽기전용인 불변형 Set자료형을 반환
+```
+fun main() {
+    val mixedTypesSet = setOf("Hello", 5, "world", 3.14, 'c') // 자료형 혼합 초기화
+    var intSet: Set<Int> = setOf<Int>(1, 5, 5)  // 정수형만 초기화
+
+    println(mixedTypesSet)
+    println(intSet)
+}
+```
+자료형을 혼합하거나 특정 자료형을 지정해 사용할 수 있으며, 중복 요소를 허용하지 않기에 중복된 요소 5가 결과에서 하나만 나타난다.
+
+##  mutableSetOf()
+
+ mutableSetOf() 함수로 추가 및 삭제가 가능한 집합을 만들 수 있다.  mutableSetOf()는 MutableSet 인터페이스 자료형을 반환하며, 내부적으로 자바의 LinkedHashSet을 만들어 낸다.
+ 
+## Set의 자료구조
+
+### hashSetOf()
+
+hashSetOf()헬퍼 함수를 통해 해시 테이블에 요소를 저장할 수 있는 자바의 HashSet컬렉션을 만든다.
+
+### sortedSetOf()
+
+sortedSetOf()함수는 자바의 TreeSet 컬렉션을 정렬된 상태로 반환하며, 사용시 패키지를 임포트 해야한다. TreeSet은 저장된 데이터의 값에 따라 정렬되며 일종의 개선된 이진 탐색 트리를 사용해 자료구조를 구성한다.
+
+### linkedSetOf()
+
+linkedSetOf()함수는 자바의 LinkedHashSEt 자료형을 반환하는 헬퍼 함수다. 이름에서 알 수 있듯이 자료구조중 하나인 링크드리스트를 이용해 구현된 해시 테이블에 요소를 저장한다.
   
+
+## mapOf()
+
+mapOf()함수는 불변형 Map 컬렉션을 만들며, 키와 값의 쌍으로 이루어진 목록을 만들기 위해 다음과 같이 사용한다.
+
+```kotlin
+val map: Map<키자료형, 값자료형> = mapOf(키 to 값[, ...])
+```
+<br>
+키와 쌍은 '키 to 값' 형태로 나타낸다.
+
+```kotlin
+fun main() {
+    // 불변형 Map의 선언 및 초기화
+    val langMap: Map<Int, String> = mapOf(11 to "Java", 22 to "Kotlin", 33 to "C++")
+    for ((key, value) in langMap) { // 키와 값의 쌍을 출력
+        println("key=$key, value=$value")
+    }
+    println("langMap[22] = ${langMap[22]}") // 키 22에 대한 요소 출력
+    println("langMap.get(22) = ${langMap.get(22)}") // 위와 동일한 표현
+    println("langMap.keys = ${langMap.keys}") // 맵의 모든 키 출력
+}
+```
+
+## mutableMapOf()
+
+mutableMapOf() 함ㅅ누는 추가, 삭제가 가능한 Map을 정의한다.
+
+
  
 
 
